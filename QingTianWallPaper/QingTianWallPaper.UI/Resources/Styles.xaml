@@ -1,0 +1,15 @@
+<!-- 积分单元格样式 -->
+<Style x:Key="PointCellStyle" TargetType="DataGridCell">
+    <Setter Property="Foreground" Value="{DynamicResource SecondaryBrush}"/>
+    <Style.Triggers>
+        <DataTrigger Binding="{Binding Points, Converter={StaticResource PointSignConverter}}" Value="Positive">
+            <Setter Property="Foreground" Value="{DynamicResource SuccessBrush}"/>
+        </DataTrigger>
+        <DataTrigger Binding="{Binding Points, Converter={StaticResource PointSignConverter}}" Value="Negative">
+            <Setter Property="Foreground" Value="{DynamicResource ErrorBrush}"/>
+        </DataTrigger>
+    </Style.Triggers>
+</Style>
+
+<!-- 积分符号转换器 -->
+<local:PointSignConverter x:Key="PointSignConverter"/>

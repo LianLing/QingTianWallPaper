@@ -1,0 +1,185 @@
+﻿<UserControl x:Class="QingTianWallPaper.UI.Controls.WallpaperCard"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+             mc:Ignorable="d"
+             d:DesignHeight="320" d:DesignWidth="240">
+
+    <UserControl.Resources>
+        <!-- 壁纸类型转换器 -->
+        <local:WallpaperTypeToIconConverter x:Key="TypeToIconConverter"/>
+        <local:FileSizeConverter x:Key="FileSizeConverter"/>
+
+        <!-- 卡片样式 -->
+        <Style x:Key="CardStyle" TargetType="Border">
+            <Setter Property="Background" Value="{DynamicResource CardBackgroundBrush}"/>
+            <Setter Property="BorderBrush" Value="{DynamicResource DividerBrush}"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="CornerRadius" Value="8"/>
+            <Setter Property="Effect">
+                <Setter.Value>
+                    <DropShadowEffect BlurRadius="6" Opacity="0.1" ShadowDepth="2"/>
+                </Setter.Value>
+            </Setter>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Effect">
+                        <Setter.Value>
+                            <DropShadowEffect BlurRadius="12" Opacity="0.2" ShadowDepth="4"/>
+                        </Setter.Value>
+                    </Setter>
+                    <Setter Property="BorderBrush" Value="{DynamicResource PrimaryHueMidBrush}"/>
+                    <Setter Property="RenderTransform">
+                        <Setter.Value>
+                            <TranslateTransform Y="-4"/>
+                        </Setter.Value>
+                    </Setter>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+
+        <!-- 渐变遮罩（用于文字在图片上的可读性） -->
+        <LinearGradientBrush x:Key="ImageOverlay" StartPoint="0,1" EndPoint="0,0">
+            <GradientStop Offset="0" Color="#CC000000"/>
+            <GradientStop Offset="0.7" Color="#66000000"/>
+            <GradientStop Offset="1" Color="#00000000"/>
+        </LinearGradientBrush>
+    </UserControl.Resources>
+
+    <Border Style="{StaticResource CardStyle}" 
+            SnapsToDevicePixels="True"
+            MouseLeftButtonDown="Border_MouseLeftButtonDown">
+        <Grid>
+            <!-- 壁纸缩略图 -->
+            <Image Source="{Binding ThumbnailPath}" 
+                   Stretch="UniformToFill" 
+                   Height="160" 
+                   VerticalAlignment="Top"
+                   ClipToBounds="True">
+                <Image.Effect>
+                    <BlurEffect Radius="0"/>
+                </Image.Effect>
+            </Image>
+
+            <!-- 图片底部渐变遮罩（用于放置标题） -->
+            <Rectangle Height="80" VerticalAlignment="Top" Fill="{StaticResource ImageOverlay}"/>
+
+            <!-- 壁纸标题 -->
+            <TextBlock Text="{Binding Title}" 
+                       FontSize="14" 
+                       FontWeight="Bold" 
+                       Foreground="White"
+                       Margin="10,120,10,0"
+                       TextTrimming="CharacterEllipsis"
+                       VerticalAlignment="Top"/>
+
+            <!-- 壁纸信息区域 -->
+            <StackPanel Orientation="Vertical" Margin="10,170,10,10">
+                <!-- 上传者信息 -->
+                <StackPanel Orientation="Horizontal" Margin="0,0,0,5">
+                    <Image Source="{Binding Uploader.AvatarUrl}" 
+                           Width="24" 
+                           Height="24" 
+                           Stretch="UniformToFill"
+                           ClipToBounds="True"
+                           RenderOptions.BitmapScalingMode="HighQuality"/>
+
+                    <TextBlock Text="{Binding Uploader.Username}" 
+                               FontSize="12" 
+                               VerticalAlignment="Center"
+                               Margin="5,0,0,0"
+                               TextTrimming="CharacterEllipsis"/>
+                </StackPanel>
+
+                <!-- 壁纸属性 -->
+                <StackPanel Orientation="Horizontal" Margin="0,0,0,5">
+                    <materialDesign:PackIcon Kind="RulerSquare" 
+                                             Width="14" 
+                                             Height="14" 
+                                             VerticalAlignment="Center"
+                                             Foreground="{DynamicResource SecondaryBrush}"/>
+
+                    <TextBlock Text="{Binding Resolution}" 
+                               FontSize="12" 
+                               VerticalAlignment="Center"
+                               Margin="3,0,0,0"/>
+
+                    <TextBlock Text=" | " 
+                               FontSize="12" 
+                               VerticalAlignment="Center"
+                               Margin="5,0,5,0"
+                               Foreground="{DynamicResource SecondaryBrush}"/>
+
+                    <materialDesign:PackIcon Kind="FileImage" 
+                                             Width="14" 
+                                             Height="14" 
+                                             VerticalAlignment="Center"
+                                             Foreground="{DynamicResource SecondaryBrush}"/>
+
+                    <TextBlock Text="{Binding FileSize, Converter={StaticResource FileSizeConverter}}" 
+                               FontSize="12" 
+                               VerticalAlignment="Center"
+                               Margin="3,0,0,0"/>
+                </StackPanel>
+
+                <!-- 壁纸类型 -->
+                <StackPanel Orientation="Horizontal" Margin="0,0,0,5">
+                    <materialDesign:PackIcon Kind="{Binding Type, Converter={StaticResource TypeToIconConverter}}" 
+                                             Width="14" 
+                                             Height="14" 
+                                             VerticalAlignment="Center"
+                                             Foreground="{DynamicResource SecondaryBrush}"/>
+
+                    <TextBlock Text="{Binding Type, Converter={StaticResource WallpaperTypeConverter}}" 
+                               FontSize="12" 
+                               VerticalAlignment="Center"
+                               Margin="3,0,0,0"/>
+                </StackPanel>
+
+                <!-- 评分和下载次数 -->
+                <StackPanel Orientation="Horizontal" Margin="0,0,0,5">
+                    <local:RatingControl Rating="{Binding AverageRating}" 
+                                         MaxRating="5" 
+                                         IsReadOnly="True" 
+                                         Height="16"/>
+
+                    <TextBlock Text="{Binding DownloadCount}" 
+                               FontSize="12" 
+                               VerticalAlignment="Center"
+                               Margin="10,0,0,0"/>
+
+                    <materialDesign:PackIcon Kind="Download" 
+                                             Width="14" 
+                                             Height="14" 
+                                             VerticalAlignment="Center"
+                                             Margin="2,0,0,0"
+                                             Foreground="{DynamicResource SecondaryBrush}"/>
+                </StackPanel>
+
+                <!-- 操作按钮 -->
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,5,0,0">
+                    <Button Style="{DynamicResource MaterialDesignFlatButton}"
+                            ToolTip="收藏"
+                            Command="{Binding DataContext.FavoriteCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                            CommandParameter="{Binding}">
+                        <materialDesign:PackIcon Kind="HeartOutline" 
+                                                 Width="16" 
+                                                 Height="16"
+                                                 Foreground="{Binding IsFavorite, Converter={StaticResource BooleanToHeartColorConverter}}"/>
+                    </Button>
+
+                    <Button Style="{DynamicResource MaterialDesignFlatButton}"
+                            ToolTip="下载"
+                            Command="{Binding DataContext.DownloadCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                            CommandParameter="{Binding}">
+                        <materialDesign:PackIcon Kind="Download" 
+                                                 Width="16" 
+                                                 Height="16"/>
+                    </Button>
+                </StackPanel>
+            </StackPanel>
+        </Grid>
+    </Border>
+</UserControl>

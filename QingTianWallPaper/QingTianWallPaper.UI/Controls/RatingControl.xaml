@@ -1,0 +1,76 @@
+﻿<UserControl x:Class="QingTianWallPaper.UI.Controls.RatingControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             mc:Ignorable="d"
+             d:DesignHeight="30" d:DesignWidth="150">
+
+    <UserControl.Resources>
+        <!-- 星级图标样式 -->
+        <Style x:Key="StarButtonStyle" TargetType="Button">
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Grid>
+                            <materialDesign:PackIcon x:Name="PART_StarIcon" 
+                                                     Kind="StarOutline" 
+                                                     Width="24" 
+                                                     Height="24" 
+                                                     Foreground="{DynamicResource SecondaryBrush}"
+                                                     HorizontalAlignment="Center"
+                                                     VerticalAlignment="Center"/>
+
+                            <materialDesign:PackIcon x:Name="PART_FilledStarIcon" 
+                                                     Kind="Star" 
+                                                     Width="24" 
+                                                     Height="24" 
+                                                     Foreground="{DynamicResource AccentBrush}"
+                                                     HorizontalAlignment="Center"
+                                                     VerticalAlignment="Center"
+                                                     Opacity="0"/>
+                        </Grid>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="PART_StarIcon" Property="Foreground" Value="{DynamicResource AccentBrush}"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="BorderBrush" Value="Transparent"/>
+            <Setter Property="Focusable" Value="False"/>
+        </Style>
+
+        <!-- 半星转换器 -->
+        <local:RatingToOpacityConverter x:Key="RatingToOpacityConverter"/>
+    </UserControl.Resources>
+
+    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+        <ItemsControl ItemsSource="{Binding Stars}" 
+                      HorizontalAlignment="Center">
+            <ItemsControl.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <StackPanel Orientation="Horizontal"/>
+                </ItemsPanelTemplate>
+            </ItemsControl.ItemsPanel>
+
+            <ItemsControl.ItemTemplate>
+                <DataTemplate>
+                    <Button Style="{StaticResource StarButtonStyle}"
+                            Command="{Binding DataContext.RateCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                            CommandParameter="{Binding Value}">
+                        <Button.OpacityMask>
+                            <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
+                                <GradientStop Offset="0" Color="Black"/>
+                                <GradientStop x:Name="OpacityStop" Offset="{Binding Value, Converter={StaticResource RatingToOpacityConverter}}" Color="Black"/>
+                                <GradientStop Offset="1" Color="Transparent"/>
+                            </LinearGradientBrush>
+                        </Button.OpacityMask>
+                    </Button>
+                </DataTemplate>
+            </ItemsControl.ItemTemplate>
+        </ItemsControl>
+    </StackPanel>
+</UserControl>
